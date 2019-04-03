@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 # Author: Benjamin Hills <bhills@redhat.com>
 #
 # This script uses git log to list the number of lines changed by one or more
@@ -16,6 +16,7 @@ usage() {
 				where:
 					-h  You're reading it
 					-s  Starting date of calculation
+					-a  All authors in the repo
 					-d  debug output
 					author(s)  The author(s) of the commits you want to calculate from
 
@@ -27,12 +28,14 @@ usage() {
 
 date=
 debug=
+all=false
 
 # Loop through the options, mostly to catch the date if they provide one
-while getopts s:dh opt; do
+while getopts s:adh opt; do
     case "$opt" in
         h)  usage ;;
         s)  date="$OPTARG" ;;
+        a)  all=true ;;
         d)  debug=debug ;;
         *)  usage ;;
     esac
@@ -40,7 +43,7 @@ done
 shift $((OPTIND - 1))
 
 # Didn't provide any positional parameters
-[ $# -gt 0 ] || usage 'input at least one author'
+[ $# -gt 0 ] && [ -n "$all" ] || usage 'input at least one author'
 
 # Show debugging output if requested
 [ -n "$debug" ] && set -x
@@ -59,7 +62,7 @@ for author; do
 			{ [[ $added = - ]] || [[ $deleted = - ]]; } && continue # skip binary files
 			(( insertions += added ))
 			(( deletions += deleted ))
-		done < <(git log --numstat --format='' --author="$author" ${date:+--since="$date"})
+		done < <(git log --numstat --format='' ${all:---author="$author"} ${date:+--since="$date"})
 
 		# Print results from that author
 		printf '%s\n' "For author: $author ${date:+since "$date"}" \
