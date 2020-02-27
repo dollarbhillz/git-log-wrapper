@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author: Benjamin Hills <bhills@redhat.com>
+# Author: Benjamin Hills <bghills@gmail.com>
 #
 # This script uses git log to list the number of lines changed by one or more
 # # author(s) in a git repo. Run it with any amount of author names as
